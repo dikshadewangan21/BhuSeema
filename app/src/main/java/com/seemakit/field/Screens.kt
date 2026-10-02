@@ -8,8 +8,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -35,14 +37,15 @@ fun gateMsg(f: Fix?) = when {
     NavHost(nc, "parcels") {
         composable("parcels") { ParcelsScreen(vm, nc) }
         composable("survey/{id}") { SurveyScreen(vm, nc, it.arguments!!.getString("id")!!.toLong()) }
-        composable("stakeout/{id}") { StakeoutScreen(vm, it.arguments!!.getString("id")!!.toLong()) }
-        composable("settings") { SettingsScreen() }
+        composable("stakeout/{id}") { StakeoutScreen(vm, nc, it.arguments!!.getString("id")!!.toLong()) }
+        composable("settings") { SettingsScreen(nc) }
     }
 }
 
 @Composable fun ParcelsScreen(vm: VM, nc: NavHostController) {
     val list by vm.parcels.collectAsState()
     var add by remember { mutableStateOf(false) }
+    var deleteTarget by remember { mutableStateOf<Parcel?>(null) }
     val sb = remember { SnackbarHostState() }; val sc = rememberCoroutineScope()
     Scaffold(
         topBar = { TopAppBar(title = { Text("BhuSeema") }, actions = {
@@ -54,15 +57,23 @@ fun gateMsg(f: Fix?) = when {
         Box(Modifier.padding(pad).fillMaxSize()) {
             when {
                 list == null -> CircularProgressIndicator(Modifier.align(Alignment.Center))
-                list!!.isEmpty() -> Text("No parcels yet. Tap + to add one.", Modifier.align(Alignment.Center).padding(24.dp))
+                list!!.isEmpty() -> Column(Modifier.align(Alignment.Center).padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("No parcels yet", style = MaterialTheme.typography.titleMedium)
+                    Spacer(Modifier.height(8.dp))
+                    Text("Tap + to create your first land parcel survey.", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
                 else -> LazyColumn(contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     items(list!!, key = { it.id }) { p ->
-                        Card(Modifier.fillMaxWidth(), onClick = { nc.navigate("survey/${p.id}") }) {
+                        Card(onClick = { nc.navigate("survey/${p.id}") }, modifier = Modifier.fillMaxWidth()) {
                             Column(Modifier.padding(16.dp)) {
                                 Text("Survey no. ${p.surveyNo}", style = MaterialTheme.typography.titleMedium)
                                 Text("${p.village} | RoR area ${"%.0f".format(p.rorAreaSqm)} sq m")
-                                Text(if (p.synced) "Synced" else "Not synced", style = MaterialTheme.typography.labelMedium)
-                                TextButton(onClick = { vm.delete(p.id) }) { Text("Delete") }
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text(if (p.synced) "✓ Synced" else "⏳ Not synced", style = MaterialTheme.typography.labelMedium,
+                                        color = if (p.synced) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant)
+                                    Spacer(Modifier.weight(1f))
+                                    TextButton(onClick = { deleteTarget = p }) { Text("Delete", color = MaterialTheme.colorScheme.error) }
+                                }
                             }
                         }
                     }
@@ -71,6 +82,17 @@ fun gateMsg(f: Fix?) = when {
         }
     }
     if (add) AddParcel({ add = false }) { s, v, a -> vm.addParcel(s, v, a); add = false }
+
+    // Delete confirmation dialog
+    deleteTarget?.let { parcel ->
+        AlertDialog(
+            onDismissRequest = { deleteTarget = null },
+            title = { Text("Delete parcel?") },
+            text = { Text("Survey no. ${parcel.surveyNo} in ${parcel.village} and all its corners will be permanently deleted.") },
+            confirmButton = { TextButton(onClick = { vm.delete(parcel.id); deleteTarget = null }) { Text("Delete", color = MaterialTheme.colorScheme.error) } },
+            dismissButton = { TextButton(onClick = { deleteTarget = null }) { Text("Cancel") } }
+        )
+    }
 }
 
 @Composable fun AddParcel(close: () -> Unit, save: (String, String, Double) -> Unit) {
@@ -98,8 +120,12 @@ fun gateMsg(f: Fix?) = when {
     if (p == null) { Box(Modifier.fillMaxSize(), Alignment.Center) { CircularProgressIndicator() }; return }
     val area = Geo.area(corners); val per = Geo.perimeter(corners)
     val ok = gateOk(fix) && owner.isNotBlank() && neigh.isNotBlank()
-    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text("Survey no. ${p.surveyNo}, ${p.village}", style = MaterialTheme.typography.titleLarge)
+    Scaffold(topBar = { TopAppBar(
+        title = { Text("Survey ${p.surveyNo}") },
+        navigationIcon = { IconButton(onClick = { nc.popBackStack() }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back") } }
+    ) }) { pad ->
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(pad).padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Text("${p.village} · Survey no. ${p.surveyNo}", style = MaterialTheme.typography.titleLarge)
         Card { Column(Modifier.padding(16.dp)) {
             Text("Rover: $status"); Text(fix?.let { "${qualityName(it.quality)} | HDOP ${"%.1f".format(it.hdop)} | ${it.sats} sats" } ?: "No fix")
             Text(gateMsg(fix), color = if (gateOk(fix)) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error)
@@ -113,7 +139,7 @@ fun gateMsg(f: Fix?) = when {
                 vm.capture(id, corners.size + 1, fix!!, gcp, owner.trim(), neigh.trim()); msg = "Corner ${corners.size + 1} saved" }) { Text("Capture corner ${corners.size + 1}") }
             if (msg.isNotEmpty()) Text(msg, color = MaterialTheme.colorScheme.primary) } }
         Text("Corners (${corners.size})", style = MaterialTheme.typography.titleMedium)
-        if (corners.isEmpty()) Text("No corners captured yet.")
+        if (corners.isEmpty()) Text("No corners captured yet. Connect the rover and capture your first corner.", color = MaterialTheme.colorScheme.onSurfaceVariant)
         corners.forEach { c -> Card(Modifier.fillMaxWidth()) { Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
                 Text("#${c.seq}${if (c.isGcp) " (GCP)" else ""}  ${"%.7f".format(c.lat)}, ${"%.7f".format(c.lon)}")
@@ -124,13 +150,14 @@ fun gateMsg(f: Fix?) = when {
             Text("Measured area: ${"%.1f".format(area)} sq m | Perimeter: ${"%.1f".format(per)} m")
             val diff = (area - p.rorAreaSqm) / p.rorAreaSqm * 100
             Text("Difference from RoR: ${"%.1f".format(diff)}%", color = if (kotlin.math.abs(diff) > 5) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface)
-            if (kotlin.math.abs(diff) > 5) Text("Flag: area differs from the record by more than 5%. Re-check corners or refer to the officer.") } }
+            if (kotlin.math.abs(diff) > 5) Text("⚠ Flag: area differs from the record by more than 5%. Re-check corners or refer to the officer.",
+                color = MaterialTheme.colorScheme.error) } }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Button(enabled = corners.size >= 3, onClick = {
                 ctx.startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, Export.json(p, corners)), "Export GeoJSON")) }) { Text("Export") }
             OutlinedButton(enabled = corners.isNotEmpty(), onClick = { nc.navigate("stakeout/$id") }) { Text("Stakeout") }
             OutlinedButton(onClick = { vm.sync(); msg = "Sync queued" }) { Text("Sync") } }
-    }
+    } }
     if (pick) { val devs = remember { vm.rover.paired() }
         AlertDialog(onDismissRequest = { pick = false }, title = { Text("Paired devices") },
             text = { if (devs.isEmpty()) Text("No paired Bluetooth devices. Pair the rover in Android settings first.")
@@ -139,34 +166,52 @@ fun gateMsg(f: Fix?) = when {
             confirmButton = { TextButton(onClick = { pick = false }) { Text("Close") } }) }
 }
 
-@Composable fun StakeoutScreen(vm: VM, id: Long) {
+@Composable fun StakeoutScreen(vm: VM, nc: NavHostController, id: Long) {
     val corners by vm.corners(id).collectAsState(emptyList()); val fix by vm.rover.fix.collectAsState()
     var sel by remember { mutableStateOf<Corner?>(null) }
-    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text("Stakeout", style = MaterialTheme.typography.titleLarge)
+    Scaffold(topBar = { TopAppBar(
+        title = { Text("Stakeout") },
+        navigationIcon = { IconButton(onClick = { nc.popBackStack() }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back") } }
+    ) }) { pad ->
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(pad).padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text("Pick a saved corner, then walk until the distance reaches zero.")
-        if (corners.isEmpty()) Text("No saved corners to stake out.")
-        corners.forEach { c -> OutlinedButton(onClick = { sel = c }) { Text("Corner #${c.seq}") } }
+        if (corners.isEmpty()) Text("No saved corners to stake out.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+        corners.forEach { c -> OutlinedButton(onClick = { sel = c }, modifier = Modifier.fillMaxWidth()) { Text("Corner #${c.seq}") } }
         val t = sel; val f = fix
         if (t != null) Card(Modifier.fillMaxWidth()) { Column(Modifier.padding(16.dp)) {
             if (f == null) Text("Waiting for rover position...") else {
-                Text("Distance: ${"%.2f".format(Geo.dist(f.lat, f.lon, t.lat, t.lon))} m", style = MaterialTheme.typography.headlineMedium)
-                Text("Bearing to target: ${"%.0f".format(Geo.bearing(f.lat, f.lon, t.lat, t.lon))} degrees from north")
-                Text("Position quality: ${qualityName(f.quality)}") } } }
-    }
+                val dist = Geo.dist(f.lat, f.lon, t.lat, t.lon)
+                Text("Distance: ${"%.2f".format(dist)} m", style = MaterialTheme.typography.headlineMedium,
+                    color = if (dist < 0.5) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface)
+                Text("Bearing to target: ${"%.0f".format(Geo.bearing(f.lat, f.lon, t.lat, t.lon))}° from north")
+                Text("Position quality: ${qualityName(f.quality)}")
+                if (dist < 0.5) Text("✓ You are at the target corner!", color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.titleMedium)
+            } } }
+    } }
 }
 
-@Composable fun SettingsScreen() {
+@Composable fun SettingsScreen(nc: NavHostController) {
     val c = LocalContext.current; val pr = remember { Secure.prefs(c) }
     var url by remember { mutableStateOf(pr.getString("url", "") ?: "") }; var tok by remember { mutableStateOf(pr.getString("token", "") ?: "") }
     var saved by remember { mutableStateOf(false) }
-    Column(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    Scaffold(topBar = { TopAppBar(
+        title = { Text("Settings") },
+        navigationIcon = { IconButton(onClick = { nc.popBackStack() }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back") } }
+    ) }) { pad ->
+    Column(Modifier.fillMaxSize().padding(pad).padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text("Server settings", style = MaterialTheme.typography.titleLarge)
         OutlinedTextField(url, { url = it; saved = false }, label = { Text("Server URL (https only)") }, singleLine = true, modifier = Modifier.fillMaxWidth(),
             isError = url.isNotEmpty() && !url.startsWith("https://"))
         OutlinedTextField(tok, { tok = it; saved = false }, label = { Text("Access token") }, singleLine = true, modifier = Modifier.fillMaxWidth())
-        Button(enabled = url.startsWith("https://"), onClick = { pr.edit().putString("url", url.trim()).putString("token", tok.trim()).apply(); saved = true }) { Text("Save") }
-        if (saved) Text("Saved (stored encrypted on this device).", color = MaterialTheme.colorScheme.primary)
-        Text("Without a server the app works fully offline; use Export to share GeoJSON.")
-    }
+        Button(enabled = url.isEmpty() || url.startsWith("https://"), onClick = { pr.edit().putString("url", url.trim()).putString("token", tok.trim()).apply(); saved = true }) { Text("Save") }
+        if (saved) Text("✓ Saved (stored encrypted on this device).", color = MaterialTheme.colorScheme.primary)
+        Spacer(Modifier.height(8.dp))
+        Card { Column(Modifier.padding(16.dp)) {
+            Text("About", style = MaterialTheme.typography.titleMedium)
+            Text("BhuSeema v1.0")
+            Text("Offline-first RTK land boundary surveying app for cadastral field work.", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Spacer(Modifier.height(8.dp))
+            Text("Without a server the app works fully offline; use Export to share GeoJSON.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        } }
+    } }
 }

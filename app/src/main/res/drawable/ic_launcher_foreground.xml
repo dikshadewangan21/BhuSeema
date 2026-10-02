@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  BhuSeema launcher icon foreground:
+  A stylized survey pin / boundary marker with crosshair
+  Designed within the 108dp safe zone (centered 72dp visible area)
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Boundary polygon (quadrilateral representing a land parcel) -->
+    <path
+        android:pathData="M34,38 L54,28 L78,42 L72,74 L38,72 Z"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2.5"
+        android:fillColor="#66BB6A"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"/>
+
+    <!-- Corner markers (survey pegs at each vertex) -->
+    <path
+        android:pathData="M34,38 m-3,0 a3,3 0,1 1,6 0 a3,3 0,1 1,-6 0"
+        android:fillColor="#FFFFFF"/>
+    <path
+        android:pathData="M54,28 m-3,0 a3,3 0,1 1,6 0 a3,3 0,1 1,-6 0"
+        android:fillColor="#FFFFFF"/>
+    <path
+        android:pathData="M78,42 m-3,0 a3,3 0,1 1,6 0 a3,3 0,1 1,-6 0"
+        android:fillColor="#FFFFFF"/>
+    <path
+        android:pathData="M72,74 m-3,0 a3,3 0,1 1,6 0 a3,3 0,1 1,-6 0"
+        android:fillColor="#FFFFFF"/>
+    <path
+        android:pathData="M38,72 m-3,0 a3,3 0,1 1,6 0 a3,3 0,1 1,-6 0"
+        android:fillColor="#FFFFFF"/>
+
+    <!-- Crosshair / survey target at center -->
+    <path
+        android:pathData="M54,46 L54,58"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="1.5"
+        android:strokeLineCap="round"/>
+    <path
+        android:pathData="M48,52 L60,52"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="1.5"
+        android:strokeLineCap="round"/>
+    <path
+        android:pathData="M54,52 m-5,0 a5,5 0,1 1,10 0 a5,5 0,1 1,-10 0"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="1.5"
+        android:fillColor="@android:color/transparent"/>
+</vector>

@@ -8,7 +8,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.compose.material3.MaterialTheme
+
 import androidx.room.Room
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
@@ -72,6 +72,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(b)
         if (android.os.Build.VERSION.SDK_INT >= 31)
             registerForActivityResult(ActivityResultContracts.RequestPermission()) {}.launch(android.Manifest.permission.BLUETOOTH_CONNECT)
-        setContent { MaterialTheme { Nav(viewModel()) } }
+        setContent { BhuSeemaTheme { Nav(viewModel()) } }
     }
 }
