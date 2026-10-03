@@ -1,4 +1,4 @@
-# BhuSeema (भूसीमा)
+# SeemaKit (सीमाकिट)
 
 [![Android](https://img.shields.io/badge/Platform-Android-3DDC84?logo=android&logoColor=white)](https://www.android.com/)
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.0.20-7F52FF?logo=kotlin&logoColor=white)](https://kotlinlang.org/)
@@ -14,15 +14,15 @@
 
 ## 📌 Overview
 
-**BhuSeema (भूसीमा)** is an offline-first Android application designed for legal land parcel surveying, cadastral boundary verification, and agricultural land administration. 
+**SeemaKit (सीमाकिट)** is an offline-first Android application designed for legal land parcel surveying, cadastral boundary verification, and agricultural land administration. 
 
-By interfacing directly with low-cost hardware rovers (**ESP32 + multi-band RTK GNSS** like the u-blox ZED-F9P) over **Bluetooth Classic SPP**, BhuSeema delivers **$\pm 1\text{ to }2\text{ cm}$ positioning precision** at **1/50th the cost** of commercial Total Stations (~₹25,000 vs ₹15,00,000).
+By interfacing directly with low-cost hardware rovers (**ESP32 + multi-band RTK GNSS** like the u-blox ZED-F9P) over **Bluetooth Classic SPP**, SeemaKit delivers **$\pm 1\text{ to }2\text{ cm}$ positioning precision** at **1/50th the cost** of commercial Total Stations (~₹25,000 vs ₹15,00,000).
 
 The application is tailored for **Indian land revenue workflows**, incorporating legal Record of Rights (RoR / खतौनी / जमाबंदी) verification, automated polygon area compliance, and **mandatory dual-witness demarcation** to make field surveys dispute-proof.
 
 ---
 
-## ⚖️ Why BhuSeema? (The Problem It Solves)
+## ⚖️ Why SeemaKit? (The Problem It Solves)
 
 - **66% of Indian Court Litigations are Land Disputes**: A landmark study by NITI Aayog and CPR confirmed that boundary disputes comprise over two-thirds of all pending civil cases in India, taking an average of 20 years to resolve.
 - **Manual Measurement Errors**: Surveys still rely on British-era iron chains (ज़रब / Gunter chain) and cloth tapes, leading to 1–2 meter discrepancies due to thermal expansion, terrain slope, and human pacing.
@@ -30,7 +30,7 @@ The application is tailored for **Indian land revenue workflows**, incorporating
 - **Cost Barrier**: Enterprise survey equipment (Trimble, Leica Total Stations) costs ₹12–18 Lakhs ($15,000+), making it inaccessible to Gram Panchayats, village surveyors, and local farmers.
 - **No Witness Accountability**: Traditional demarcations lack recorded neighbour consent, leading to immediate boundary clashes post-survey.
 
-**BhuSeema solves this by delivering centimeter precision, legal witness protection, and real-time revenue record auditing in an accessible mobile tool.**
+**SeemaKit solves this by delivering centimeter precision, legal witness protection, and real-time revenue record auditing in an accessible mobile tool.**
 
 ---
 
@@ -127,7 +127,7 @@ app/src/main/java/com/seemakit/field/
 
 ## 🛠️ Hardware Setup & Bill of Materials (BOM)
 
-BhuSeema is designed to interface with low-cost, open-hardware RTK rovers:
+SeemaKit is designed to interface with low-cost, open-hardware RTK rovers:
 
 | Component | Specification | Approx. Cost |
 | :--- | :--- | :--- |
@@ -141,7 +141,7 @@ BhuSeema is designed to interface with low-cost, open-hardware RTK rovers:
 ### Rover Connection
 1. Power on the ESP32 RTK rover.
 2. In your Android phone's Bluetooth settings, pair with the rover.
-3. Open BhuSeema $\rightarrow$ open any survey $\rightarrow$ tap **Hardware** under the rover card $\rightarrow$ select your paired device.
+3. Open SeemaKit $\rightarrow$ open any survey $\rightarrow$ tap **Hardware** under the rover card $\rightarrow$ select your paired device.
 4. The rover streams standard NMEA GGA sentences over SPP UUID `00001101-0000-1000-8000-00805F9B34FB`.
 
 *(Alternatively, tap **Simulate Rover** inside the app to test everything without any physical hardware.)*
@@ -176,7 +176,7 @@ The generated APK will be available at:
 
 ## 🏛️ Alignment with Government Initiatives
 
-BhuSeema is architected to integrate seamlessly with digital land administration initiatives in India:
+SeemaKit is architected to integrate seamlessly with digital land administration initiatives in India:
 
 - **PM SVAMITVA Scheme**: Supports rapid cadastral mapping of rural inhabited (*Abadi*) areas.
 - **DILRMP (Digital India Land Records Modernization Programme)**: Facilitates boundary digitization and mutation verifications.

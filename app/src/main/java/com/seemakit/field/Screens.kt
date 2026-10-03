@@ -66,11 +66,8 @@ fun gateMsg(f: Fix?) = when {
         topBar = {
             TopAppBar(
                 title = {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Surface(shape = RoundedCornerShape(8.dp), color = MaterialTheme.colorScheme.primaryContainer, modifier = Modifier.padding(end = 8.dp)) {
-                            Text("BhuSeema", modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onPrimaryContainer)
-                        }
-                        Text("भूसीमा", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Surface(shape = RoundedCornerShape(8.dp), color = MaterialTheme.colorScheme.primaryContainer) {
+                        Text("SeemaKit", modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onPrimaryContainer)
                     }
                 },
                 actions = {
@@ -170,7 +167,7 @@ fun gateMsg(f: Fix?) = when {
                                     }
                                     Text("Village: ${p.village}", style = MaterialTheme.typography.bodyMedium)
                                     Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Text("Record of Rights (RoR): ${"%.0f".format(p.rorAreaSqm)} sq m", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                        Text("RoR Area: ${"%.0f".format(p.rorAreaSqm)} sq m", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                         Spacer(Modifier.weight(1f))
                                         TextButton(onClick = { deleteTarget = p }) {
                                             Text("Delete", color = MaterialTheme.colorScheme.error)
@@ -670,10 +667,10 @@ fun gateMsg(f: Fix?) = when {
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
             ) {
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("About BhuSeema (भूसीमा)", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text("About SeemaKit (सीमाकिट)", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                     Text("Version 1.0 (Prototype)", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
                     Text(
-                        "BhuSeema is a decentralized, centimeter-accurate RTK land boundary surveying system. " +
+                        "SeemaKit is a decentralized, centimeter-accurate RTK land boundary surveying system. " +
                         "It empowers rural surveyors, panchayats, and farmers to demarcate land parcels at 1/50th the cost of commercial Total Stations, " +
                         "protecting against boundary disputes with mandatory dual-witness verification.",
                         style = MaterialTheme.typography.bodySmall

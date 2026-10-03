@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import kotlin.math.*
 
 /**
- * Stakeout Target Radar HUD for BhuSeema.
+ * Stakeout Target Radar HUD for SeemaKit.
  * Visually guides the surveyor to relocated corner pegs with concentric range rings,
  * directional needle, and instant target lock feedback (< 0.5m).
  */

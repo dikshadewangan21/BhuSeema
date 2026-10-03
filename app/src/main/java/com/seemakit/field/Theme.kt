@@ -7,7 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
-// BhuSeema brand palette — earth & survey greens
+// SeemaKit brand palette — earth & survey greens
 private val Seed = Color(0xFF2E7D32)
 
 private val LightColors = lightColorScheme(
@@ -57,7 +57,7 @@ private val DarkColors = darkColorScheme(
 )
 
 @Composable
-fun BhuSeemaTheme(
+fun SeemaKitTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit

@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import kotlin.math.*
 
 /**
- * 2D Interactive Cadastral Map Visualizer for BhuSeema.
+ * 2D Interactive Cadastral Map Visualizer for SeemaKit.
  * Displays field boundary polygon, numbered corner pegs with distances,
  * a North orientation compass, and real-time live rover location marker.
  */

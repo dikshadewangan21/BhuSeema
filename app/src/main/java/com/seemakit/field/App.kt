@@ -88,6 +88,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(b)
         if (android.os.Build.VERSION.SDK_INT >= 31)
             registerForActivityResult(ActivityResultContracts.RequestPermission()) {}.launch(android.Manifest.permission.BLUETOOTH_CONNECT)
-        setContent { BhuSeemaTheme { Nav(viewModel()) } }
+        setContent { SeemaKitTheme { Nav(viewModel()) } }
     }
 }
